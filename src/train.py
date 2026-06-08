@@ -1,6 +1,7 @@
 from argparse import ArgumentParser
 from pathlib import Path
 
+import joblib
 import matplotlib.pyplot as plt
 from sklearn.datasets import load_iris
 from sklearn.metrics import ConfusionMatrixDisplay, accuracy_score, confusion_matrix
@@ -27,7 +28,9 @@ def train_and_evaluate(test_size=0.2, random_state=42, output_dir="outputs"):
 
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
+    model_path = output_path / "model.joblib"
     figure_path = output_path / "confusion_matrix.png"
+    joblib.dump(model, model_path)
 
     display = ConfusionMatrixDisplay(
         confusion_matrix=matrix,
@@ -39,7 +42,7 @@ def train_and_evaluate(test_size=0.2, random_state=42, output_dir="outputs"):
     plt.savefig(figure_path)
     plt.close()
 
-    return accuracy, matrix, figure_path
+    return accuracy, matrix, figure_path, model_path
 
 
 def parse_args():
@@ -52,7 +55,7 @@ def parse_args():
 
 def main():
     args = parse_args()
-    accuracy, matrix, figure_path = train_and_evaluate(
+    accuracy, matrix, figure_path, model_path = train_and_evaluate(
         test_size=args.test_size,
         random_state=args.random_state,
         output_dir=args.output_dir,
@@ -62,6 +65,7 @@ def main():
     print("Confusion matrix:")
     print(matrix)
     print(f"Saved confusion matrix figure to: {figure_path}")
+    print(f"Saved model to: {model_path}")
 
 
 if __name__ == "__main__":
